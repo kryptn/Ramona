@@ -57,7 +57,6 @@ if isMainModule:
 
 
     while true:
-        dumpNumberOfInstances()
         for feed in datastore.keys:
             checkFeed(feed)
             consumeUnseenItems(1000)
