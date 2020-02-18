@@ -15,7 +15,7 @@ variable "gcp_zone" {
     type = string
 }
 
-variable "gcp_credentials" {
+variable "google_cloud_keyfile" {
     type = string
 }
 
@@ -29,24 +29,24 @@ variable "container_version" {
 }
 
 provider "google" {
-    credentials = variable.gcp_credentials
-    project = variable.gcp_project
-    region = variable.gcp_region
+    credentials = var.google_cloud_keyfile
+    project = var.gcp_project
+    region = var.gcp_region
 }
 
 
 resource "google_cloud_run_service" "default" {
     name = "ramona-notifier"
-    location = variable.region
+    location = var.gcp_region
 
     template {
         spec {
             containers {
-                image = "docker.pkg.github.com/kryptn/ramona/ramona:${variable.container_version}"
-            }
-            env {
-                name = "SLACK_TOKEN"
-                value = variable.slack_token
+                image = "docker.pkg.github.com/kryptn/ramona/ramona:${var.container_version}"
+                env {
+                    name = "SLACK_TOKEN"
+                    value = var.slack_token
+                }
             }
         }
     }
