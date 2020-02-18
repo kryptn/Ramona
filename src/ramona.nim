@@ -5,7 +5,7 @@ import ramonapkg/feed
 
 when isMainModule:
   let slackClient = NewSlackHttpClient()
-  CheckDefinedFeeds(init=true)
+  CheckDefinedFeeds(init=false)
 
   while true:
     CheckDefinedFeeds()

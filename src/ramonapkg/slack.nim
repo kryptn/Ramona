@@ -22,7 +22,7 @@ proc NewSlackHttpClient*(): HttpClient =
     let token = getEnv("SLACK_TOKEN")
     result.headers = newHttpHeaders({
         "Authorization": fmt"Bearer {token}",
-        "Content-Type": "application/json",
+        "Content-Type": "application/json; charset=utf-8",
     })
 
 proc SendSlackMessage*(client: HttpClient, channel, message: string): JsonNode =
