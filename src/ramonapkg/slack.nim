@@ -16,7 +16,7 @@ proc sendMessage(client: HttpClient, channel, message: string): JsonNode =
     let data = response.body.parseJson()
     return data
 
-proc newSlackHttpClient(): HttpClient =
+proc NewSlackHttpClient*(): HttpClient =
     result = newHttpClient()
 
     let token = getEnv("SLACK_TOKEN")
@@ -25,14 +25,14 @@ proc newSlackHttpClient(): HttpClient =
         "Content-Type": "application/json",
     })
 
+proc SendSlackMessage*(client: HttpClient, channel, message: string): JsonNode =
+    client.sendMessage(channel, message)
 
-proc SendMessage*(channel, message: string): JsonNode =
-    let client = newSlackHttpClient()
-    let respData = client.sendMessage(channel, message)
-
-    return respData
+proc SendSlackMessage*(channel, message: string): JsonNode =
+    let client = NewSlackHttpClient()
+    return client.SendSlackMessage(channel, message)
 
 
 if isMainModule:
-    let client = newSlackHttpClient()
+    let client = NewSlackHttpClient()
     echo client.sendMessage("#bot-test", "hi")

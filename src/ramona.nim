@@ -1,5 +1,13 @@
-# This is just an example to get you started. A typical binary package
-# uses this file as the main entry point of the application.
+import os
+
+import ramonapkg/slack
+import ramonapkg/feed
 
 when isMainModule:
-  echo("Hello, World!")
+  let slackClient = NewSlackHttpClient()
+  CheckDefinedFeeds(init=true)
+
+  while true:
+    CheckDefinedFeeds()
+    slackClient.emitUnseenItems()
+    sleep(5*60*1000)
