@@ -21,7 +21,7 @@ jobs:
             TF_API_TOKEN: ${{ secrets.TF_API_TOKEN}}
         run: |
             cd infra/
-            terraform init -backend-config="token=$TF_API_TOKEN"
+            terraform init -backend-config="token=$TF_API_TOKEN" -backend-config=backend.hcl
             cd ..
       - name: Docker Login
         run: |
