@@ -25,7 +25,7 @@ jobs:
             cd ..
       - name: Docker Login
         run: |
-            docker login -u kryptn -p {{ secrets.GITHUB_TOKEN }} docker.pkg.github.com
+            docker login -u $GITHUB_ACTOR -p ${{ secrets.GITHUB_TOKEN }} docker.pkg.github.com
       - name: Docker Build
         run: |
             docker build -t docker.pkg.github.com/kryptn/ramona/ramona:latest .
