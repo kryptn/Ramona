@@ -20,7 +20,7 @@ jobs:
         env:
             TF_API_TOKEN: ${{ secrets.TF_API_TOKEN}}
         run: |
-            cd infra/
+            cd terraform/
             terraform init -backend-config="token=$TF_API_TOKEN" -backend-config=backend.hcl
             cd ..
       - name: Docker Login
@@ -34,4 +34,4 @@ jobs:
             docker push docker.pkg.github.com/kryptn/ramona/ramona:latest
       - name: Terraform Plan
         run: |
-            terraform apply
+            terraform plan
