@@ -27,21 +27,24 @@ resource "digitalocean_droplet" "ramona" {
 
   ssh_keys = [digitalocean_ssh_key.default.id]
 
+}
+
+resource "null_resource" "docker_run" {
+
   provisioner "remote-exec" {
     inline = [
       "docker login -u ${var.github_username} -p ${var.github_personal_access_token} docker.pkg.github.com",
-      "docker run -dit --restart always -e SLACK_TOKEN=${var.slack_token} docker.pkg.github.com/kryptn/ramona/ramona:latest"
+      "docker run -dit --restart always -e SLACK_TOKEN=${var.slack_token} docker.pkg.github.com/kryptn/ramona/ramona:${var.container_version}"
     ]
 
     connection {
       type        = "ssh"
       user        = "root"
       private_key = data.null_data_source.creds.outputs["private_key"]
-      host        = self.ipv4_address
+      host        = digitalocean_droplet.ramona.ipv4_address
     }
-  }
+  }  
 }
-
 
 output "docker_host" {
   value = digitalocean_droplet.ramona.ipv4_address
