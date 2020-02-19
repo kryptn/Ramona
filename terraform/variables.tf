@@ -21,10 +21,12 @@ variable "container_version" {
 
 variable "public_key_file" {
   type = string
+  default = ""
 }
 
 variable "private_key_file" {
   type = string
+  default = ""
 }
 
 variable "public_key" {
