@@ -1,53 +1,52 @@
 terraform {
-    required_version = "~> 0.12.0"
-    backend "remote" {}
+  required_version = "~> 0.12.0"
+  # backend "remote" {}
 }
 
-variable "gcp_project" {
-    type = string
+provider "digitalocean" {
+  token = var.do_token
 }
 
-variable "gcp_region" {
-    type = string
+data "null_data_source" "creds" {
+  inputs = {
+    private_key = var.private_key == "" ? file(var.private_key_file) : var.private_key
+    public_key  = var.public_key == "" ? file(var.public_key_file) : var.public_key
+  }
 }
 
-variable "gcp_zone" {
-    type = string
+resource "digitalocean_ssh_key" "default" {
+  name       = "quantric-ramona-tf"
+  public_key = data.null_data_source.creds.outputs["public_key"]
 }
 
-variable "google_cloud_keyfile" {
-    type = string
-}
+resource "digitalocean_droplet" "ramona" {
+  image  = "docker-18-04"
+  name   = "ramona-1"
+  region = "sfo2"
+  size   = "s-1vcpu-1gb"
 
-variable "slack_token" {
-    type = string
-}
+  ssh_keys = [digitalocean_ssh_key.default.id]
 
-variable "container_version" {
-    type = string
-    default = "latest"
-}
+  provisioner "remote-exec" {
+    inline = [
+      "docker login -u ${var.github_username} -p ${var.github_personal_access_token} docker.pkg.github.com",
+      "docker run -dit --restart always -e SLACK_TOKEN=${var.slack_token} docker.pkg.github.com/kryptn/ramona/ramona:latest"
+    ]
 
-provider "google" {
-    credentials = var.google_cloud_keyfile
-    project = var.gcp_project
-    region = var.gcp_region
-}
-
-
-resource "google_cloud_run_service" "default" {
-    name = "ramona-notifier"
-    location = var.gcp_region
-
-    template {
-        spec {
-            containers {
-                image = "docker.pkg.github.com/kryptn/ramona/ramona:${var.container_version}"
-                env {
-                    name = "SLACK_TOKEN"
-                    value = var.slack_token
-                }
-            }
-        }
+    connection {
+      type        = "ssh"
+      user        = "root"
+      private_key = data.null_data_source.creds.outputs["private_key"]
+      host        = self.ipv4_address
     }
+  }
+}
+
+
+output "docker_host" {
+  value = digitalocean_droplet.ramona.ipv4_address
+}
+
+output "ssh_cmd" {
+  value = "ssh -i ${var.private_key_file} root@${digitalocean_droplet.ramona.ipv4_address}"
 }
