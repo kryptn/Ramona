@@ -1,16 +1,16 @@
-FROM nimlang/nim:alpine
+FROM nimlang/nim:alpine as build
 
-RUN apk upgrade --update-cache --available && \
-    apk add openssl && \
-    rm -rf /var/cache/apk/*
+RUN apk -U add openssl
 
 RUN mkdir -p /opt/ramona
 WORKDIR /opt/ramona
 
 COPY . .
 
-RUN nimble build -d:ssl -y
+RUN nimble build -d:ssl -d:release -y
 
-CMD ["bin/ramona"]
+FROM alpine
+RUN apk -U add openssl
 
-
+COPY --from=build /opt/ramona/bin/ramona /ramona
+CMD ["/ramona"]
