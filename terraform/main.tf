@@ -52,7 +52,7 @@ resource "null_resource" "docker_run" {
     when = "destroy"
 
     inline = [      
-      "docker stop ramona_notifier"
+      "docker stop ramona_notifier",
       "docker rmi ${var.container_image}"
     ]
 
