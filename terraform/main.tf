@@ -37,7 +37,7 @@ resource "null_resource" "docker_run" {
   provisioner "remote-exec" {
     inline = [
       "docker login -u ${var.github_username} -p ${var.github_personal_access_token} docker.pkg.github.com",
-      "docker run -dit --restart always -e SLACK_TOKEN=${var.slack_token} RAMONA_CONFIG_URL=${var.ramona_config_url} docker.pkg.github.com/kryptn/ramona/ramona:${var.container_version}"
+      "docker run -dit --name ramona_notifier --restart always -e SLACK_TOKEN=${var.slack_token} -e RAMONA_CONFIG_URL=${var.ramona_config_url} docker.pkg.github.com/kryptn/ramona/ramona:${var.container_version}"
     ]
 
     connection {
