@@ -19,6 +19,8 @@ when isMainModule:
   for feed in feeds.items:
     feed.init()
 
+  discard slackClient.SendSlackMessage("#bot-test", "I've just initialized")
+
   while true:
     log(lvlInfo, "updating feeds")
     for feed in feeds.items:
