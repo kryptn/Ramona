@@ -54,6 +54,7 @@ resource "null_resource" "docker_run" {
 
     inline = [      
       "docker stop ramona_notifier || echo 'already stopped or does not exist'",
+      "docker rm ramona_notifier || echo 'already removed or does not exist'",
     ]
 
     connection {
