@@ -14,10 +14,6 @@ variable "slack_token" {
   type = string
 }
 
-variable "container_image" {
-  type = string
-  default = "docker.pkg.github.com/kryptn/ramona/ramona"
-}
 
 variable "container_version" {
   type    = string
