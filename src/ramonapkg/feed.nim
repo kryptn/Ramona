@@ -52,6 +52,12 @@ proc init*(feed: Feed) =
     let feedItems = feed.getFeedItems()
     feed.setItems(feedItems)
 
+proc init*(feeds: seq[Feed]) =
+    log(lvlInfo, "initializing all feeds")
+    for feed in feeds.items:
+      feed.init()
+
+
 proc update*(feed: Feed, emit: proc(channel, message: string)) =
     let feedItems = feed.getFeedItems()
     
@@ -64,6 +70,11 @@ proc update*(feed: Feed, emit: proc(channel, message: string)) =
         emit(feed.channel, message)
 
     feed.setItems(feedItems)
+
+proc update*(feeds: seq[Feed], emit: proc(channel, message: string)) =
+    log(lvlInfo, "updating feeds")
+    for feed in feeds.items:
+      feed.update(emit)
 
 
 

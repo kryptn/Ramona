@@ -15,14 +15,9 @@ when isMainModule:
   let configUrl = os.getEnv("RAMONA_CONFIG_URL").string
   var feeds = FeedsFromConfigUrl(configUrl)
 
-  log(lvlInfo, "initializing all feeds")
-  for feed in feeds.items:
-    feed.init()
-
-  discard slackClient.SendSlackMessage("#bot-test", "I've just initialized")
+  feeds.init()
+  discard slackClient.SendSlackMessage("#bot-test", "I've just initialized, starting loop")
 
   while true:
-    log(lvlInfo, "updating feeds")
-    for feed in feeds.items:
-      feed.update(slackClient.Emit)
+    feeds.update(slackClient.Emit)
     sleep(5*60*1000)
