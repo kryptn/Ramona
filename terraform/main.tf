@@ -30,11 +30,30 @@ resource "digitalocean_droplet" "ramona" {
 }
 
 resource "null_resource" "docker_run" {
+  triggers = {
+    always_run = "${timestamp()}"
+  }
 
   provisioner "remote-exec" {
     inline = [
       "docker login -u ${var.github_username} -p ${var.github_personal_access_token} docker.pkg.github.com",
-      "docker run -dit --restart always -e SLACK_TOKEN=${var.slack_token} RAMONA_CONFIG_URL=${var.ramona_config_url} docker.pkg.github.com/kryptn/ramona/ramona:${var.container_version}"
+      "docker run -dit --restart always -e SLACK_TOKEN=${var.slack_token} RAMONA_CONFIG_URL=${var.ramona_config_url} ${var.container_image}:${var.container_version}"
+    ]
+
+    connection {
+      type        = "ssh"
+      user        = "root"
+      private_key = data.null_data_source.creds.outputs["private_key"]
+      host        = digitalocean_droplet.ramona.ipv4_address
+    }
+  }  
+
+  provisioner "remote-exec" {
+    when = "destroy"
+
+    inline = [      
+      "docker stop ramona_notifier"
+      "docker rmi ${var.container_image}"
     ]
 
     connection {
