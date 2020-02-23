@@ -53,7 +53,7 @@ resource "null_resource" "docker_run" {
 
     inline = [      
       "docker stop ramona_notifier || echo 'already stopped or does not exist'",
-      "docker rmi docker.pkg.github.com/kryptn/ramona/ramona"
+      "docker rmi docker.pkg.github.com/kryptn/ramona/ramona -f || echo 'no container to remove'"
     ]
 
     connection {
