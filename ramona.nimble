@@ -17,4 +17,8 @@ task trySlack, "try slack":
   exec "nim c -r -d:ssl --out:bin/trys/slack src/ramonapkg/slack.nim"
 
 task tryFeed, "try feed":
-  exec "nim c -r -d:ssl -d:nimTypeNames --out:bin/trys/feed src/ramonapkg/feed.nim"
+  exec "nim c -r -d:ssl --out:bin/trys/feed src/ramonapkg/feed.nim"
+
+task test, "run tests":
+  exec "nim c -r --out:bin/tests/test_feed tests/pkg/test_feed.nim"
+  exec "nim c -r --out:bin/tests/test_slack tests/pkg/test_slack.nim"

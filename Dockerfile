@@ -9,7 +9,7 @@ COPY . .
 
 RUN nimble build -d:ssl -d:release -y
 
-FROM alpine
+FROM alpine:3.11.3
 RUN apk -U add openssl
 
 COPY --from=build /opt/ramona/bin/ramona /ramona
