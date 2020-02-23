@@ -52,7 +52,7 @@ resource "null_resource" "docker_run" {
     when = destroy
 
     inline = [      
-      "docker stop ramona_notifier",
+      "docker stop ramona_notifier || echo 'already stopped or does not exist'",
       "docker rmi docker.pkg.github.com/kryptn/ramona/ramona"
     ]
 
