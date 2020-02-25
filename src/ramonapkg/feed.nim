@@ -38,8 +38,18 @@ proc FeedsFromConfigFile*(filename: string): seq[Feed] =
 
 
 proc getFeedItems(feed: Feed): seq[RSSItem] =
+    result = @[]
     log(lvlDebug, fmt"getting feed items [name: {feed.name}, channel: {feed.channel}]")
-    result = getRSS(feed.url).items
+
+    try:
+        result = getRSS(feed.url).items
+    except:
+        let
+            e = getCurrentException()
+            msg = getCurrentExceptionMsg()
+        let errorMsg = fmt"got exception {repr(e)}: {msg}"
+        log(lvlError, errorMsg)
+
 
 proc setItems(feed: Feed, feedItems: seq[RSSItem]) =
     feed.items = feedItems.mapIt(it.link).toHashSet()
@@ -65,7 +75,7 @@ proc update*(feed: Feed, emit: proc(channel, message: string)) =
     log(lvlDebug, fmt"got {updatedItems.len} new feed items [name: {feed.name}, channel: {feed.channel}]")
 
     for item in feed.updatedItems(feedItems).items:
-        log(lvlInfo, fmt"emitting udpate [name: {feed.name}, channel: {feed.channel}, title: {item.title}, link: {item.link}]")
+        log(lvlInfo, fmt"emitting update [name: {feed.name}, channel: {feed.channel}, title: {item.title}, link: {item.link}]")
         let message = fmt"from {feed.name}: {item.title} {item.guid}"
         emit(feed.channel, message)
 
