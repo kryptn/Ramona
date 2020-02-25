@@ -38,7 +38,7 @@ proc FeedsFromConfigFile*(filename: string): seq[Feed] =
 
 
 proc getFeedItems(feed: Feed): seq[RSSItem] =
-    log(lvlInfo, fmt"getting feed items [name: {feed.name}, channel: {feed.channel}]")
+    log(lvlDebug, fmt"getting feed items [name: {feed.name}, channel: {feed.channel}]")
     result = getRSS(feed.url).items
 
 proc setItems(feed: Feed, feedItems: seq[RSSItem]) =
@@ -62,7 +62,7 @@ proc update*(feed: Feed, emit: proc(channel, message: string)) =
     let feedItems = feed.getFeedItems()
     
     let updatedItems = feed.updatedItems(feedItems)
-    log(lvlInfo, fmt"got {updatedItems.len} new feed items [name: {feed.name}, channel: {feed.channel}]")
+    log(lvlDebug, fmt"got {updatedItems.len} new feed items [name: {feed.name}, channel: {feed.channel}]")
 
     for item in feed.updatedItems(feedItems).items:
         log(lvlInfo, fmt"emitting udpate [name: {feed.name}, channel: {feed.channel}, title: {item.title}, link: {item.link}]")
@@ -71,8 +71,9 @@ proc update*(feed: Feed, emit: proc(channel, message: string)) =
 
     feed.setItems(feedItems)
 
-proc update*(feeds: seq[Feed], emit: proc(channel, message: string)) =
+proc update*(feeds: seq[Feed], emitter: proc(): proc(channel, message: string)) =
     log(lvlInfo, "updating feeds")
+    let emit = emitter()
     for feed in feeds.items:
       feed.update(emit)
 

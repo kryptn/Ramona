@@ -10,14 +10,15 @@ addHandler(consoleLogger)
 when isMainModule:
 
   log(lvlInfo, "starting ramona, hello")
-  let slackClient = NewSlackHttpClient()
+
+  let slackEmitter = Emitter()
 
   let configUrl = os.getEnv("RAMONA_CONFIG_URL").string
   var feeds = FeedsFromConfigUrl(configUrl)
 
   feeds.init()
-  discard slackClient.SendSlackMessage("#bot-test", "I've just initialized, starting loop")
+  slackEmitter()("#bot-test", "I've just initialized, starting loop")
 
   while true:
-    feeds.update(slackClient.Emit)
+    feeds.update(slackEmitter)
     sleep(5*60*1000)

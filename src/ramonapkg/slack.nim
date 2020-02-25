@@ -49,6 +49,13 @@ proc Emit*(client: HttpClient): proc(channel, message: string) =
     result = proc(channel, message: string) =
         discard client.SendSlackMessage(channel, message)
 
+proc Emitter*(): proc(): proc(channel, message: string) =
+    let client = NewSlackHttpClient()
+
+    result = proc(): proc(channel, message: string) =
+        return proc(channel, message: string) =
+            discard client.SendSlackMessage(channel, message)
+
 when isMainModule:
 
     var consoleLogger = newConsoleLogger(fmtStr="[$time] - $app - $levelname: ")
