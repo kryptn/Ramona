@@ -18,7 +18,7 @@ type
     
 
 proc NewFeed*(feedName, feedUrl, slackChannel: string): Feed =
-    log(lvlInfo, fmt"creating new feed [name: {feedName}, channel: {slackChannel}]")
+    info(fmt"creating new feed [name: {feedName}, channel: {slackChannel}]")
     result = Feed(name: feedName, url: feedUrl, channel: slackChannel)
 
 proc feedsFromConfig(config: JsonNode): seq[Feed] =
@@ -44,7 +44,7 @@ proc FeedsFromConfigFile*(filename: string): seq[Feed] =
 
 proc getFeedItems(feed: Feed): seq[RSSItem] =
     result = @[]
-    log(lvlDebug, fmt"getting feed items [name: {feed.name}, channel: {feed.channel}]")
+    debug(fmt"getting feed items [name: {feed.name}, channel: {feed.channel}]")
 
     try:
         result = getRSS(feed.url).items
@@ -53,7 +53,7 @@ proc getFeedItems(feed: Feed): seq[RSSItem] =
             e = getCurrentException()
             msg = getCurrentExceptionMsg()
         let errorMsg = fmt"got exception {repr(e)}: {msg}"
-        log(lvlError, errorMsg)
+        error(errorMsg)
 
 
 proc setItems(feed: Feed, feedItems: seq[RSSItem]) =
@@ -63,12 +63,12 @@ proc updatedItems(feed: Feed, feedItems: seq[RSSItem]): seq[RssItem] =
     result = feedItems.filterIt(feed.items.contains(it.link) == false)
 
 proc init*(feed: Feed) =
-    log(lvlInfo, fmt"initializing feed items [name: {feed.name}, channel: {feed.channel}]")
+    info(fmt"initializing feed items [name: {feed.name}, channel: {feed.channel}]")
     let feedItems = feed.getFeedItems()
     feed.setItems(feedItems)
 
 proc init*(feeds: seq[Feed]) =
-    log(lvlInfo, "initializing all feeds")
+    info("initializing all feeds")
     for feed in feeds.items:
       feed.init()
 
@@ -77,17 +77,17 @@ proc update*(feed: Feed, emit: proc(channel, message: string)) =
     let feedItems = feed.getFeedItems()
     
     let updatedItems = feed.updatedItems(feedItems)
-    log(lvlDebug, fmt"got {updatedItems.len} new feed items [name: {feed.name}, channel: {feed.channel}]")
+    debug(fmt"got {updatedItems.len} new feed items [name: {feed.name}, channel: {feed.channel}]")
 
     for item in feed.updatedItems(feedItems).items:
-        log(lvlInfo, fmt"emitting update [name: {feed.name}, channel: {feed.channel}, title: {item.title}, link: {item.link}]")
+        info(fmt"emitting update [name: {feed.name}, channel: {feed.channel}, title: {item.title}, link: {item.link}]")
         let message = fmt"from {feed.name}: {item.title} {item.guid}"
         emit(feed.channel, message)
 
     feed.setItems(feedItems)
 
 proc update*(feeds: seq[Feed]) =
-    log(lvlInfo, "updating feeds")
+    info("updating feeds")
 
     withSlackClient:
         for feed in feeds.items:

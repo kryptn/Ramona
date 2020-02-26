@@ -4,9 +4,6 @@ import json
 import strformat
 import logging
 
-import macros
-
-
 proc sendMessage(client: HttpClient, channel, message: string): JsonNode =
     let apiUrl = "https://slack.com/api/chat.postMessage"
 
@@ -33,7 +30,7 @@ proc NewSlackHttpClient*(): HttpClient =
         "Content-Type": "application/json; charset=utf-8",
     })
 
-    log(lvlInfo, "created authenticated slack client")
+    info("created authenticated slack client")
 
 
 

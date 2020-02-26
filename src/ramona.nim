@@ -3,20 +3,22 @@ import logging
 
 import ramonapkg/slack
 import ramonapkg/feed
+import ramonapkg/slacklogger
 
 var consoleLogger = newConsoleLogger(fmtStr="[$datetime] - $appname - $levelname: ")
+var slackLogHandler = newSlackLogger("#bot-test", lvlNotice, fmtStr="[$datetime] - $appname - $levelname: ")
 addHandler(consoleLogger)
+addHandler(slackLogHandler)
 
 when isMainModule:
 
-  log(lvlInfo, "starting ramona, hello")
+  notice("starting ramona, hello")
 
   let configUrl = os.getEnv("RAMONA_CONFIG_URL").string
   var feeds = FeedsFromConfigUrl(configUrl)
-
   feeds.init()
 
-  discard SendSlackMessage("#bot-test", "I've just initialized, starting loop")
+  notice("I've just initialized, starting loop")
 
   while true:
     feeds.update()
