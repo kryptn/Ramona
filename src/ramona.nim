@@ -11,14 +11,13 @@ when isMainModule:
 
   log(lvlInfo, "starting ramona, hello")
 
-  let slackEmitter = Emitter()
-
   let configUrl = os.getEnv("RAMONA_CONFIG_URL").string
   var feeds = FeedsFromConfigUrl(configUrl)
 
   feeds.init()
-  slackEmitter()("#bot-test", "I've just initialized, starting loop")
+
+  discard SendSlackMessage("#bot-test", "I've just initialized, starting loop")
 
   while true:
-    feeds.update(slackEmitter)
+    feeds.update()
     sleep(5*60*1000)

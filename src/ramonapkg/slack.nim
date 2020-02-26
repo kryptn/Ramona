@@ -4,6 +4,7 @@ import json
 import strformat
 import logging
 
+import macros
 
 
 proc sendMessage(client: HttpClient, channel, message: string): JsonNode =
@@ -36,30 +37,26 @@ proc NewSlackHttpClient*(): HttpClient =
 
 
 
+template withSlackClient*(body: untyped) =
+    let client {.inject.} = NewSlackHttpClient()
+    defer: client.close()
+    body    
+
 proc SendSlackMessage*(client: HttpClient, channel, message: string): JsonNode =
     client.sendMessage(channel, message)
 
 proc SendSlackMessage*(channel, message: string): JsonNode =
-    let client = NewSlackHttpClient()
-    return client.SendSlackMessage(channel, message)
+    withSlackClient:
+        return client.SendSlackMessage(channel, message)
 
 
 proc Emit*(client: HttpClient): proc(channel, message: string) =
-
     result = proc(channel, message: string) =
         discard client.SendSlackMessage(channel, message)
 
-proc Emitter*(): proc(): proc(channel, message: string) =
-    let client = NewSlackHttpClient()
-
-    result = proc(): proc(channel, message: string) =
-        return proc(channel, message: string) =
-            discard client.SendSlackMessage(channel, message)
 
 when isMainModule:
-
     var consoleLogger = newConsoleLogger(fmtStr="[$time] - $app - $levelname: ")
     addHandler(consoleLogger)
 
-    let client = NewSlackHttpClient()
-    echo client.sendMessage("#bot-test", "hi")
+    echo SendSlackMessage("#bot-test", "hi")

@@ -7,6 +7,8 @@ import logging
 import sets
 import sequtils
 
+import slack
+
 type
     Feed = ref object of RootObj
         name: string
@@ -29,7 +31,10 @@ proc feedsFromConfig(config: JsonNode): seq[Feed] =
     config.getElems.mapIt(feedFromIt(it))
 
 proc FeedsFromConfigUrl*(url: string): seq[Feed] =
-    let config = newHttpClient().getContent(url).parseJson
+    let client = newHttpClient()
+    defer: client.close()
+
+    let config = client.getContent(url).parseJson
     return feedsFromConfig(config)
 
 proc FeedsFromConfigFile*(filename: string): seq[Feed] =
@@ -81,12 +86,12 @@ proc update*(feed: Feed, emit: proc(channel, message: string)) =
 
     feed.setItems(feedItems)
 
-proc update*(feeds: seq[Feed], emitter: proc(): proc(channel, message: string)) =
+proc update*(feeds: seq[Feed]) =
     log(lvlInfo, "updating feeds")
-    let emit = emitter()
-    for feed in feeds.items:
-      feed.update(emit)
 
+    withSlackClient:
+        for feed in feeds.items:
+            feed.update(client.Emit)
 
 
 when isMainModule:
@@ -101,3 +106,5 @@ when isMainModule:
 
     for feed in feeds.items:
         feed.update(client.Emit)
+
+    client.close()
