@@ -1,14 +1,13 @@
 import os
 import logging
 
-import ramonapkg/slack
 import ramonapkg/feed
 import ramonapkg/slacklogger
 
-var consoleLogger = newConsoleLogger(fmtStr="[$datetime] - $appname - $levelname: ")
-var slackLogHandler = newSlackLogger("#bot-test", lvlNotice, fmtStr="[$datetime] - $appname - $levelname: ")
-addHandler(consoleLogger)
-addHandler(slackLogHandler)
+let fmtStr = "[$datetime] - $appname - $levelname: "
+
+addHandler newConsoleLogger(lvlInfo, fmtStr=fmtStr)
+addHandler newSlackLogger("#bot-test", lvlNotice, fmtStr=fmtStr)
 
 when isMainModule:
 

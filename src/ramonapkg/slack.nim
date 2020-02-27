@@ -30,7 +30,7 @@ proc NewSlackHttpClient*(): HttpClient =
         "Content-Type": "application/json; charset=utf-8",
     })
 
-    info("created authenticated slack client")
+    debug("created authenticated slack client")
 
 
 
