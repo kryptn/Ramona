@@ -2,6 +2,10 @@ variable "host_ipv4_address" {
   type = string
 }
 
+variable "private_key" {
+  type    = string
+}
+
 variable "github_username" {
   type = string
 }
@@ -17,16 +21,6 @@ variable "slack_token" {
 variable "container_version" {
   type    = string
   default = "latest"
-}
-
-variable "public_key" {
-  type    = string
-  default = ""
-}
-
-variable "private_key" {
-  type    = string
-  default = ""
 }
 
 variable "ramona_config_url" {

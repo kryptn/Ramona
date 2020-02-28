@@ -1,6 +1,5 @@
 terraform {
   required_version = "~> 0.12.0"
-  # backend "remote" {}
 }
 
 resource "null_resource" "docker_run" {
