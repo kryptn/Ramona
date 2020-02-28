@@ -3,32 +3,6 @@ terraform {
   # backend "remote" {}
 }
 
-provider "digitalocean" {
-  token = var.do_token
-}
-
-data "null_data_source" "creds" {
-  inputs = {
-    private_key = var.private_key == "" ? file(var.private_key_file) : var.private_key
-    public_key  = var.public_key == "" ? file(var.public_key_file) : var.public_key
-  }
-}
-
-resource "digitalocean_ssh_key" "default" {
-  name       = "quantric-ramona-tf"
-  public_key = data.null_data_source.creds.outputs["public_key"]
-}
-
-resource "digitalocean_droplet" "ramona" {
-  image  = "docker-18-04"
-  name   = "ramona-1"
-  region = "sfo2"
-  size   = "s-1vcpu-1gb"
-
-  ssh_keys = [digitalocean_ssh_key.default.id]
-
-}
-
 resource "null_resource" "docker_run" {
   triggers = {
     always_run = "${timestamp()}"
@@ -44,15 +18,15 @@ resource "null_resource" "docker_run" {
     connection {
       type        = "ssh"
       user        = "root"
-      private_key = data.null_data_source.creds.outputs["private_key"]
-      host        = digitalocean_droplet.ramona.ipv4_address
+      private_key = var.private_key
+      host        = var.host_ipv4_address
     }
-  }  
+  }
 
   provisioner "remote-exec" {
     when = destroy
 
-    inline = [      
+    inline = [
       "docker stop ramona_notifier || echo 'already stopped or does not exist'",
       "docker rm ramona_notifier || echo 'already removed or does not exist'",
     ]
@@ -60,16 +34,10 @@ resource "null_resource" "docker_run" {
     connection {
       type        = "ssh"
       user        = "root"
-      private_key = data.null_data_source.creds.outputs["private_key"]
-      host        = digitalocean_droplet.ramona.ipv4_address
+      private_key = var.private_key
+      host        = var.host_ipv4_address
     }
-  }  
+  }
 }
 
-output "docker_host" {
-  value = digitalocean_droplet.ramona.ipv4_address
-}
 
-output "ssh_cmd" {
-  value = "ssh -i ${var.private_key_file} root@${digitalocean_droplet.ramona.ipv4_address}"
-}
