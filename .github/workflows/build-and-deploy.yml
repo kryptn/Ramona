@@ -3,7 +3,7 @@ on: [push]
 
 jobs:
   build:
-    name: Build & Deploy
+    name: Build & Push Container
     # This job runs on Linux
     runs-on: ubuntu-latest
     steps:
@@ -13,7 +13,10 @@ jobs:
             docker login -u $GITHUB_ACTOR -p ${{ secrets.GITHUB_TOKEN }} docker.pkg.github.com
       - name: Docker Build
         run: |
-            docker build -t docker.pkg.github.com/kryptn/ramona/ramona:latest .
+            docker build -t ramona .
       - name: Docker Push
         run: |
+            docker tag ramona docker.pkg.github.com/kryptn/ramona/ramona:latest
+            docker tag ramona docker.pkg.github.com/kryptn/ramona/ramona:$GITHUB_SHA
             docker push docker.pkg.github.com/kryptn/ramona/ramona:latest
+            docker push docker.pkg.github.com/kryptn/ramona/ramona:$GITHUB_SHA
