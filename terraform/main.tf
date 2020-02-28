@@ -3,6 +3,11 @@ terraform {
 }
 
 resource "null_resource" "docker_run" {
+
+  triggers = {
+    container_version = var.container_version
+  }
+
   provisioner "remote-exec" {
     inline = [
       "docker login -u ${var.github_username} -p ${var.github_personal_access_token} docker.pkg.github.com",
