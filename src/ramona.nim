@@ -21,4 +21,4 @@ when isMainModule:
 
   while true:
     feeds.update()
-    sleep(5*60*1000)
+    sleep(10*60*1000)
