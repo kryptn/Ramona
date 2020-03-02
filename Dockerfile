@@ -7,7 +7,7 @@ WORKDIR /opt/ramona
 
 COPY . .
 
-RUN nimble build -d:ssl -d:release -y
+RUN nimble build -d:commit="$(git rev-parse HEAD)" -d:ssl -d:release -y
 
 FROM alpine:3.11.3
 RUN apk -U add openssl

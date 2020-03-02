@@ -52,7 +52,7 @@ proc getFeedItems(feed: Feed): seq[RSSItem] =
         let
             e = getCurrentException()
             msg = getCurrentExceptionMsg()
-        let errorMsg = fmt"got exception in feed\n\n[name: {feed.name}, channel: {feed.channel}]\n\n{msg}\n\n{repr(e)}"
+        let errorMsg = fmt"got exception in feed{'\n'}{'\n'}[name: {feed.name}, channel: {feed.channel}]{'\n'}{'\n'}{msg}{'\n'}{'\n'}{repr(e)}"
         error(errorMsg)
 
 
